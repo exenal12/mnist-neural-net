@@ -7,8 +7,10 @@ public class Main {
         System.out.println("Enter a matrix. Separate values with numbers, and end each row with a semicolon.");
 
         String unparsedMatrix = scanner.nextLine();
-        System.out.println("Unparsed matrix: " + unparsedMatrix);
-        NeuralNetUtils.Menu.parseMatrixInput(unparsedMatrix);
+        double[][] parsed = NeuralNetUtils.Menu.parseMatrixInput(unparsedMatrix);
+
+        System.out.println("You entered: ");
+        NeuralNetUtils.Linear.Matrix.print(parsed);
 
         scanner.close();
     }

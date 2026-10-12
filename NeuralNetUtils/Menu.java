@@ -1,7 +1,7 @@
 package NeuralNetUtils;
 
 public class Menu {
-    public static void parseMatrixInput(String input) {
+    public static double[][] parseMatrixInput(String input) {
         // count semicolons; semicolons = rows
         String[] rows = input.split(";");
         String[][] cells = new String[rows.length][];
@@ -25,6 +25,6 @@ public class Menu {
             }
         }
 
-        Linear.Matrix.print(mat);
+        return mat;
     }
 }
