@@ -107,6 +107,7 @@ public class Menu {
             System.out.println("1. View weights and biases");
             System.out.println("2. View network info");
             System.out.println("3. Set learning rate");
+            System.out.println("4. Set inputs");
             System.out.println("0. Return to main menu");
             System.out.print("> ");
             String choice = scanner.nextLine();
@@ -128,6 +129,10 @@ public class Menu {
                     clearScreen();
                     setNewLearningRate();
                     break;
+                case "4":
+                    clearScreen();
+                    setInputs();
+                    break;
                 case "0":
                     return;
                 default:
@@ -136,6 +141,31 @@ public class Menu {
 
             }
         }   
+    }
+
+    private static void setInputs() {
+        int expectedCount = neuralNet.neuronsPerLayer[0];
+        System.out.println("Enter " + expectedCount + " input values separated by commas (i.e. 0.1,0.2,0.3):");
+        System.out.print("> ");
+        String[] values = scanner.nextLine().split(",");
+
+        if (values.length != expectedCount) {
+            System.out.println("Expected " + expectedCount + " values, but got " + values.length + ".");
+        } else {
+            try {
+                double[] inputs = new double[expectedCount];
+                for (int i = 0; i < expectedCount; i++) {
+                    inputs[i] = Double.parseDouble(values[i].trim());
+                }
+                neuralNet.setInputs(inputs);
+                System.out.println("Inputs set.");
+            } catch (NumberFormatException e) {
+                System.out.println("Enter valid numbers separated by commas.");
+            }
+        }
+
+        System.out.println("Press Enter to continue.");
+        scanner.nextLine();
     }
 
     private static void setNewLearningRate() {
