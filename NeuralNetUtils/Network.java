@@ -54,12 +54,14 @@ public class Network {
     Layer headLayer;
     Layer tailLayer;
 
+    // constructor sets neurons per layer
     public Network(int[] neuronsPerLayer) {
         this.neuronsPerLayer = neuronsPerLayer;
         this.layers = 0;
+        this.learningRate = 0.10;
     }
 
-
+    // adds layer to linked list
     public void addLayer(int neurons) {
         Layer newLayer = new Layer(neurons);
 
@@ -75,24 +77,36 @@ public class Network {
         newLayer.prevLayer = tailLayer;
         tailLayer = newLayer;
 
+        // increase count and init layer
         layers++;
-        // after adding, initialize the layer
         newLayer.init(random);
     }
-
+    
     public void createLayers() {
+        // length of neuronsPerLayer dictates number of layers
         for (int i = 0; i < neuronsPerLayer.length; i++) {
             // for each layer, create and append to network linked list
             addLayer(neuronsPerLayer[i]);
         }
     }
+    
+    // sets activations on first layer
+    public void setInputs(double[] inputs) {
+        headLayer.activations = inputs;
+    }
 
+    public void printInputs() {
+        Linear.Vector.print(headLayer.activations);
+    }
+
+    public void setLearningRate(double learningRate) {
+        this.learningRate = learningRate;
+    }
+    // traverse linked list and print
     public void printWeightsAndBiases() {
         int counter = 0;
         Layer cur = headLayer;
         while (cur != null) {
-            double[][] weights = cur.getWeights();
-            double[] biases = cur.getBiases();
             System.out.println("Layer " + counter);
             System.out.println("Weights: ");
             
@@ -113,4 +127,16 @@ public class Network {
         }
     }
 
+    public void printNetworkInfo() {
+        System.out.println("Learning rate: " + learningRate);
+        System.out.println("Layer count: " + layers);
+        for (int i = 0; i < layers; i++) {
+            System.out.println("Layer " + i + " neuron count: " + neuronsPerLayer[i]);
+        }
+        System.out.print("Inputs: ");
+        printInputs();
+    }
+
 }
+
+

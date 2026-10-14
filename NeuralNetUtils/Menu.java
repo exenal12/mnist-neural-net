@@ -105,17 +105,30 @@ public class Menu {
             clearScreen();
             System.out.println("NETWORK OPTIONS\n\n");
             System.out.println("1. View weights and biases");
-            System.out.println("2. Return to main menu");
+            System.out.println("2. View network info");
+            System.out.println("3. Set learning rate");
+            System.out.println("0. Return to main menu");
             System.out.print("> ");
             String choice = scanner.nextLine();
             switch (choice) {
                 case "1":
                     clearScreen();
                     neuralNet.printWeightsAndBiases();
-                    System.out.println("Press Enter to continue.");
+                    System.out.println("\n\nPress Enter to continue.");
                     scanner.nextLine();
                     break;
+                
                 case "2":
+                    clearScreen();
+                    neuralNet.printNetworkInfo();
+                    System.out.println("\n\nPress Enter to continue.");
+                    scanner.nextLine();
+                    break;
+                case "3":
+                    clearScreen();
+                    setNewLearningRate();
+                    break;
+                case "0":
                     return;
                 default:
                     System.out.println("Invalid choice. Press Enter to continue.");
@@ -123,5 +136,21 @@ public class Menu {
 
             }
         }   
+    }
+
+    private static void setNewLearningRate() {
+        System.out.println("Enter a new learning rate (i.e. 0.2):");
+        System.out.print("> ");
+        String input = scanner.nextLine();
+        try {
+            double newRate = Double.parseDouble(input.trim());
+            neuralNet.setLearningRate(newRate);
+            System.out.println("Learning rate set to " + newRate);
+        } catch (NumberFormatException e) {
+            System.out.println("Enter a valid number.");
+        }
+
+        System.out.println("Press Enter to continue.");
+        scanner.nextLine();
     }
 }
