@@ -1,23 +1,8 @@
 package NeuralNetUtils;
 
-
-/**
- * Vector and matrix arithmetic.
- *
- * @author Alyx
- */
 public class Linear{
-    /**
-     * Operations on vectors.
-     *
-     * @author Alyx
-     */
     public static class Vector {
-        /**
-         * Prints a vector as one row.
-         *
-         * @param vec vector to print
-         */
+
         public static void print(double[] vec) {
             System.out.print("[");
             for (double value : vec) {
@@ -26,14 +11,6 @@ public class Linear{
             System.out.println(" ]");
         }
 
-        /**
-         * Returns the dot product of two vectors of equal length
-         *
-         * @param vec1 first vector
-         * @param vec2 second vector
-         * @return the result of the dot product, as a {@code double}
-         * @throws IllegalArgumentException if the vectors have different lengths
-         */
         public static double dotProduct(double[] vec1, double[] vec2) {
             // check size
             if (vec1.length != vec2.length) {
@@ -49,17 +26,8 @@ public class Linear{
         }
     }
 
-    /**
-     * Operations on matrices.
-     *
-     * @author Alyx
-     */
     public static class Matrix {
-        /**
-         * Prints a matrix with aligned columns, four digits after the decimal.
-         *
-         * @param mat matrix to print
-         */
+
         public static void print(double[][] mat) {
             for (double[] row : mat) {
                 System.out.print("[");
@@ -70,13 +38,6 @@ public class Linear{
             }
         }
     
-        /**
-         * Copies one column of a matrix into a new vector
-         *
-         * @param mat matrix to read
-         * @param colNum zero-based column index
-         * @return specified column, from top to bottom
-         */
         public static double[] getColumn(double[][] mat, int colNum){
            double[] resCol = new double[mat.length];
            
@@ -114,14 +75,6 @@ public class Linear{
             return sum;
         }
     
-        /**
-         * Multiplies two matrices. {@code mat1} must have as many columns as {@code mat2} has rows
-         *
-         * @param mat1 left matrix
-         * @param mat2 right matrix
-         * @return the product matrix
-         * @throws IllegalArgumentException if the matrices have incompatible sizes
-         */
         public static double[][] multiply(double[][] mat1, double[][] mat2) {
             // check size
             if (mat1[0].length != mat2.length) {
