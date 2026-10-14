@@ -57,6 +57,7 @@ public class Menu {
             System.out.println("MAIN MENU\n\n");
             System.out.println("1. Create network");
             if (neuralNet != null) System.out.println("2. Network options");
+            System.out.println("3. Setup for Part 1");
             System.out.println("0. Exit");
             System.out.print("> ");
 
@@ -68,6 +69,9 @@ public class Menu {
                 case "2":
                     networkOptions();
                     break;
+                case "3":
+                    part1Setup();
+                    break;
                 case "0":
                     running = false;
                     break;
@@ -75,6 +79,31 @@ public class Menu {
                     System.out.println("Invalid choice. Press Enter to continue.");
                     scanner.nextLine();
             }
+        }
+    }
+
+    private static void part1Setup() {
+        clearScreen();
+        System.out.println("This will set up the network with weights, biases, and learning rate according to part 1 of the assignment.");
+        System.out.println("Type yes or no to continue.\n\n");
+        System.out.print("> ");
+        String choice = scanner.nextLine().trim();
+
+        switch (choice) {
+            case "yes":
+                neuralNet = new Network(new int[]{4,3,2});
+                neuralNet.createLayers();
+                neuralNet.part1Setup();
+                neuralNet.setLearningRate(10.0);
+                neuralNet.setInputs(new double[]{0,1,0,1});
+                System.out.println("Network has been set up. Press Enter to continue.");
+                scanner.nextLine();
+                break;
+            case "no":
+                return;
+            default:
+                System.out.println("Invalid choice. Press enter to continue.");
+                scanner.nextLine();
         }
     }
 

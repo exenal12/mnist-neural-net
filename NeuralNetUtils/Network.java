@@ -21,6 +21,10 @@ public class Network {
             this.nextLayer = null;
         }
 
+        private static double sigmoid(double zValue) {
+            return (1.0 / (1.0 + (Math.E^(-zValue))))
+        }
+
         // will be called during Network creation
         private void init(Random random){
             // create activations, biases arrays
@@ -43,6 +47,9 @@ public class Network {
                     }
                 }
             }
+        }
+
+        private void calculateActivations() {
         }
     }
 
@@ -135,6 +142,24 @@ public class Network {
         }
         System.out.print("Inputs: ");
         printInputs();
+    }
+
+    public void part1Setup(){
+        // hardcoded layer setup for part 1
+        Layer layer0 = headLayer;
+        Layer layer1 = layer0.nextLayer;
+        Layer layer2 = layer1.nextLayer;
+        layer1.biases = new double[]{0.1, -0.36, -0.31};
+        layer1.weights = new double[][]{
+            {-0.21, 0.72, -0.25, 1},
+            {-0.94, -0.41, -0.47, 0.63},
+            {0.15, 0.55, -0.49, -0.75},
+        };
+        layer2.biases = new double[]{0.16, -0.46};
+        layer2.weights = new double[][]{
+            {0.76, 0.48, -0.73},
+            {0.34, 0.89, -0.23},
+        };
     }
 
 }
