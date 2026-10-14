@@ -1,0 +1,1 @@
+Weight generation - https://www.geeksforgeeks.org/deep-learning/xavier-initialization/

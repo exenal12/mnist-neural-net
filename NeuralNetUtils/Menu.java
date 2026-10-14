@@ -1,5 +1,5 @@
 package NeuralNetUtils;
-
+import java.util.Arrays;
 public class Menu {
     public static double[][] parseMatrixInput(String input) {
         // count semicolons; semicolons = rows
@@ -26,5 +26,18 @@ public class Menu {
         }
 
         return mat;
+    }
+
+    public static Network createNewNetwork(String input) {
+        // count commas
+        String[] splitInput = input.split(",");
+        int[] neuronsPerLayer = new int[splitInput.length];
+
+        // convert to int[]
+        for (int i = 0; i < splitInput.length; i++) {
+            neuronsPerLayer[i] = Integer.parseInt(splitInput[i]);
+        }
+
+        return new Network(neuronsPerLayer);
     }
 }

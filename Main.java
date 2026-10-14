@@ -4,14 +4,12 @@ import NeuralNetUtils.*;
 public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Enter a matrix. Separate values with numbers, and end each row with a semicolon.");
+        System.out.println("Enter the amount of neurons per layer you want.\nThe amount of values entered dictates how many layers there are.\nSeparate counts with commas (i.e. 1,2,3).");
 
-        String unparsedMatrix = scanner.nextLine();
-        double[][] parsed = NeuralNetUtils.Menu.parseMatrixInput(unparsedMatrix);
+        String neuronCounts = scanner.nextLine();
+        Network neuralNet = NeuralNetUtils.Menu.createNewNetwork(neuronCounts);
 
-        System.out.println("You entered: ");
-        NeuralNetUtils.Linear.Matrix.print(parsed);
-
+        neuralNet.createLayers();
         scanner.close();
     }
 
