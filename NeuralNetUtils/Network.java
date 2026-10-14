@@ -22,7 +22,7 @@ public class Network {
         }
 
         private static double sigmoid(double zValue) {
-            return (1.0 / (1.0 + (Math.E^(-zValue))))
+            return (1.0 / (1.0 + (Math.pow(Math.E, (-zValue)))));
         }
 
         // will be called during Network creation
@@ -50,6 +50,27 @@ public class Network {
         }
 
         private void calculateActivations() {
+            // due to how i coded my matrix functions, must convert activations/biases to single-column matrices
+            double[][] prevActivations = new double[prevLayer.activations.length][1];
+            double[][] biasMatrix = new double[neurons][1];
+
+            for (int i = 0; i < prevActivations.length; i++) {
+                prevActivations[i][0] = prevLayer.activations[i];
+            }
+
+            for (int i = 0; i < neurons; i++) {
+                biasMatrix[i][0] = this.biases[i];
+            }
+
+            // zMatrix = (W x A) + B
+            double[][] zMatrix = Linear.Matrix.add(
+                Linear.Matrix.multiply(this.weights, prevActivations),
+                biasMatrix
+            );
+
+            for (int i = 0; i < neurons; i++) {
+                this.activations[i] = sigmoid(zMatrix[i][0]);
+            }
         }
     }
 
@@ -160,6 +181,15 @@ public class Network {
             {0.76, 0.48, -0.73},
             {0.34, 0.89, -0.23},
         };
+    }
+
+    public void forwardPass() {
+        Layer cur = headLayer.nextLayer;
+        while (cur != null) {
+            cur.calculateActivations();
+            cur = cur.nextLayer;
+        }
+        Linear.Vector.print(tailLayer.activations);
     }
 
 }

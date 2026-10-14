@@ -78,9 +78,9 @@ public class Linear{
          * @return specified column, from top to bottom
          */
         public static double[] getColumn(double[][] mat, int colNum){
-           double[] resCol = new double[mat[colNum].length];
+           double[] resCol = new double[mat.length];
            
-           for (int i = 0; i < mat[colNum].length; i++){
+           for (int i = 0; i < mat.length; i++){
             resCol[i] = mat[i][colNum];
            }
            
@@ -88,6 +88,31 @@ public class Linear{
         }
     
     
+        public static double[][] add(double[][] mat1, double[][] mat2) {
+            int rows = mat1.length;
+            if (rows == 0 || mat2.length != rows) {
+                throw new IllegalArgumentException("Incompatible matrix sizes");
+            }
+
+            int columns = mat1[0].length;
+            if (columns == 0) {
+                throw new IllegalArgumentException("Matrices must have at least one column");
+            }
+            for (int i = 0; i < rows; i++) {
+                if (mat1[i].length != columns || mat2[i].length != columns) {
+                    throw new IllegalArgumentException("Incompatible matrix sizes");
+                }
+            }
+
+            double[][] sum = new double[rows][columns];
+            for (int i = 0; i < rows; i++) {
+                for (int j = 0; j < columns; j++) {
+                    sum[i][j] = mat1[i][j] + mat2[i][j];
+                }
+            }
+
+            return sum;
+        }
     
         /**
          * Multiplies two matrices. {@code mat1} must have as many columns as {@code mat2} has rows
