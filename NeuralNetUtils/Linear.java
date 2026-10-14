@@ -14,6 +14,19 @@ public class Linear{
      */
     public static class Vector {
         /**
+         * Prints a vector as one row.
+         *
+         * @param vec vector to print
+         */
+        public static void print(double[] vec) {
+            System.out.print("[");
+            for (double value : vec) {
+                System.out.printf(" %8.4f", value);
+            }
+            System.out.println(" ]");
+        }
+
+        /**
          * Returns the dot product of two vectors of equal length
          *
          * @param vec1 first vector

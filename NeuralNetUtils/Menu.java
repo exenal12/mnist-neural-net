@@ -110,7 +110,7 @@ public class Menu {
             String choice = scanner.nextLine();
             switch (choice) {
                 case "1":
-                    System.out.println("WIP");
+                    neuralNet.printWeightsAndBiases();
                     scanner.nextLine();
                     break;
                 case "2":

@@ -42,11 +42,31 @@ public class Network {
                         weights[i][j] = (random.nextDouble() * 2 - 1) * weightScale;
                     }
                 }
-
-                // print weights
-                Linear.Matrix.print(weights);
             }
+        }
 
+        private void setActivations(double[] activations) {
+            this.activations = activations;
+        }
+
+        private double[] getActivations() {
+            return activations;
+        }
+
+        private void setWeights(double[][] weights) {
+            this.weights = weights;
+        }
+
+        private double[][] getWeights() {
+            return weights;
+        }
+
+        private void setBiases(double[] biases) {
+            this.biases = biases;
+        }
+
+        private double[] getBiases() {
+            return biases;
         }
 
     }
@@ -88,6 +108,32 @@ public class Network {
         for (int i = 0; i < neuronsPerLayer.length; i++) {
             // for each layer, create and append to network linked list
             addLayer(neuronsPerLayer[i]);
+        }
+    }
+
+    public void printWeightsAndBiases() {
+        int counter = 0;
+        Layer cur = headLayer;
+        while (cur != null) {
+            double[][] weights = cur.getWeights();
+            double[] biases = cur.getBiases();
+            System.out.println("Layer " + counter);
+            System.out.println("Weights: ");
+            
+            if (cur.weights == null) {
+                System.out.println("No weights for this layer");
+            } else {
+                Linear.Matrix.print(cur.weights);
+            }
+            
+            System.out.println("Biases: ");
+            if (cur.biases == null) {
+                System.out.println("No biases for this layer");
+            } else {
+                Linear.Vector.print(cur.biases);
+            }
+            counter++;
+            cur = cur.nextLayer;
         }
     }
 
