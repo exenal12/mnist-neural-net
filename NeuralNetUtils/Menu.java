@@ -106,11 +106,13 @@ public class Menu {
             System.out.println("NETWORK OPTIONS\n\n");
             System.out.println("1. View weights and biases");
             System.out.println("2. Return to main menu");
-            System.out.println(">");
+            System.out.print("> ");
             String choice = scanner.nextLine();
             switch (choice) {
                 case "1":
+                    clearScreen();
                     neuralNet.printWeightsAndBiases();
+                    System.out.println("Press Enter to continue.");
                     scanner.nextLine();
                     break;
                 case "2":

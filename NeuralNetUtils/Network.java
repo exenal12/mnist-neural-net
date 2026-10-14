@@ -44,36 +44,12 @@ public class Network {
                 }
             }
         }
-
-        private void setActivations(double[] activations) {
-            this.activations = activations;
-        }
-
-        private double[] getActivations() {
-            return activations;
-        }
-
-        private void setWeights(double[][] weights) {
-            this.weights = weights;
-        }
-
-        private double[][] getWeights() {
-            return weights;
-        }
-
-        private void setBiases(double[] biases) {
-            this.biases = biases;
-        }
-
-        private double[] getBiases() {
-            return biases;
-        }
-
     }
 
     Random random = new Random();
     int[] neuronsPerLayer;
     int layers;
+    double learningRate;
 
     Layer headLayer;
     Layer tailLayer;
