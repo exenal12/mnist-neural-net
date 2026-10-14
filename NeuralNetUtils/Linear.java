@@ -1,5 +1,4 @@
 package NeuralNetUtils;
-import java.util.Arrays;
 
 
 /**
@@ -44,13 +43,17 @@ public class Linear{
      */
     public static class Matrix {
         /**
-         * Prints each row of a matrix on its own line
+         * Prints a matrix with aligned columns, four digits after the decimal.
          *
          * @param mat matrix to print
          */
         public static void print(double[][] mat) {
-            for (double[] row : mat){
-                System.out.println(Arrays.toString(row));
+            for (double[] row : mat) {
+                System.out.print("[");
+                for (double value : row) {
+                    System.out.printf(" %8.4f", value);
+                }
+                System.out.println(" ]");
             }
         }
     

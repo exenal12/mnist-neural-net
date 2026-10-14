@@ -53,12 +53,14 @@ public class Network {
 
     Random random = new Random();
     int[] neuronsPerLayer;
+    int layers;
 
     Layer headLayer;
     Layer tailLayer;
 
     public Network(int[] neuronsPerLayer) {
         this.neuronsPerLayer = neuronsPerLayer;
+        this.layers = 0;
     }
 
 
@@ -69,6 +71,7 @@ public class Network {
             headLayer = newLayer;
             tailLayer = newLayer;
             newLayer.init(random);
+            layers++;
             return;
         }
 
@@ -76,6 +79,7 @@ public class Network {
         newLayer.prevLayer = tailLayer;
         tailLayer = newLayer;
 
+        layers++;
         // after adding, initialize the layer
         newLayer.init(random);
     }
