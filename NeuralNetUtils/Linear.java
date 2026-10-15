@@ -80,6 +80,31 @@ public class Linear{
 
             return sum;
         }
+
+        public static double[][] subtract(double[][] mat1, double[][] mat2) {
+            int rows = mat1.length;
+            int columns = mat1[0].length;
+            
+            // check size
+            if (rows == 0 || mat2.length != rows) {
+                throw new IllegalArgumentException("Incompatible matrix sizes");
+            }
+
+            for (int i = 0; i < rows; i++) {
+                if (mat1[i].length != columns || mat2[i].length != columns) {
+                    throw new IllegalArgumentException("Incompatible matrix sizes");
+                }
+            }
+
+            double[][] sum = new double[rows][columns];
+            for (int i = 0; i < rows; i++) {
+                for (int j = 0; j < columns; j++) {
+                    sum[i][j] = mat1[i][j] - mat2[i][j];
+                }
+            }
+
+            return sum;
+        }
     
         public static double[][] multiply(double[][] mat1, double[][] mat2) {
             // check size

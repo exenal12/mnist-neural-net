@@ -13,7 +13,10 @@ public class Network {
         double[][] activations;
         double[][] biases;
         double[][] weights;
-        
+        double[][] biasGradient;
+        double[][] weightGradient;
+        double[][] expected;
+
         // simple layer constructor
         Layer(int neurons) {
             this.neurons = neurons;
@@ -30,15 +33,21 @@ public class Network {
             // create activations, biases arrays
             activations = new double[neurons][1];
             biases = new double[neurons][1];
+            biasGradient = new double[neurons][1];
             
             // create weights only if not the first layer
             if (prevLayer != null) {
+                if (nextLayer == null) {
+                    // init expected bias if and only if on the final layer
+                    expected = new double[neurons][1]
+                }
                 // xavier initialization for weight generation
                 double weightScale = Math.sqrt(6.0 / (prevLayer.neurons + neurons));
 
                 // rows = # of neurons in this layer
                 // cols = # of neurons in prev layer
                 weights = new double[neurons][prevLayer.neurons];
+                weightGradient = new double[neurons][prevLayer.neurons];
 
                 // fill weights
                 for (int i = 0; i < weights.length; i++) {
@@ -63,7 +72,35 @@ public class Network {
         }
 
         private void calculateBiasGradient() {
+            // create matrix of all 1s
+            double[][] oneMatrix = new double[this.activations.length][this.activations[0].length];
+            for (double[] row : oneMatrix) {
+                Arrays.fill(row, 1);
+            }
+
+            double[][] oneMinusAct = Linear.Matrix.subtract(oneMatrix, this.activations);
             
+            if (nextLayer == null) {
+                // if on final layer, the calculation is different
+                double[][] actMinusExpected = Linear.Matrix.subtract(this.activations, this.expected)
+                double[][] hada = Linear.Matrix.hadamard(actMinusExpected, this.activations);
+                double[][] grad = Linear.Matrix.hadamard(hada, oneMinusAct)
+                this.biasGradient = grad;    
+            } else if (prevLayer != null && nextLayer != null) {
+                // hidden layers
+                double[][] nextWeightxNextBiasG = Linear.Matrix.multiply(Linear.Matrix.transpose(this.nextLayer.weights), this.nextLayer.biasGradient);
+                double[][] hada = Linear.Matrix.hadamard(nextWeightxNextBiasG, this.activations);
+                double[][] grad = Linear.Matrix.hadamard(hada, oneMinusAct);
+                this.biasGradient = grad;
+            }
+        }
+
+        private void calculateWeightGradient() {
+            if (prevLayer != null) {
+                // dont calculate on input layer
+                double [][] grad = Linear.Matrix.multiply(this.biasGradient, Linear.Matrix.transpose(this.prevLayer.activations));
+                this.weightGradient = grad;
+            }
         }
     }
 
