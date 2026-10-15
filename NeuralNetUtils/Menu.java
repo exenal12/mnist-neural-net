@@ -59,6 +59,7 @@ public class Menu {
             if (neuralNet != null) System.out.println("2. Network options");
             System.out.println("3. Setup for Part 1");
             if (neuralNet != null) System.out.println("4. Perform a forward pass");
+            if (neuralNet != null) System.out.println("5. Perform back propagation");
             System.out.println("0. Exit");
             System.out.print("> ");
 
@@ -68,20 +69,26 @@ public class Menu {
                     networkPrompt();
                     break;
                 case "2":
-                    networkOptions();
+                    if (neuralNet != null) networkOptions();
                     break;
                 case "3":
                     part1Setup();
                     break;
                 case "4":
-                    if (neuralNet == null) {
-                        System.out.println("Create a network first.");
-                    } else {
+                    if (neuralNet != null) {
                         clearScreen();
                         neuralNet.forwardPass();
+                        System.out.println("Press Enter to continue.");
+                        scanner.nextLine();
                     }
-                    System.out.println("Press Enter to continue.");
-                    scanner.nextLine();
+                    break;
+                case "5":
+                    if (neuralNet != null) {
+                        clearScreen();
+                        neuralNet.backPropagation();
+                        System.out.println("Press Enter to continue.");
+                        scanner.nextLine();
+                    }
                     break;
                 case "0":
                     running = false;

@@ -32,7 +32,7 @@ public class Linear{
             for (double[] row : mat) {
                 System.out.print("[");
                 for (double value : row) {
-                    System.out.printf(" %8.4f", value);
+                    System.out.printf(" %8.5f", value);
                 }
                 System.out.println(" ]");
             }
@@ -151,14 +151,14 @@ public class Linear{
             }
 
             // iterate, multiply, and return
-            double[][] prod = new double[rows][columns]
+            double[][] prod = new double[rows][columns];
             for (int i = 0; i < rows; i++) {
                 for (int j = 0; j < columns; j++) {
-                    prod[i][j] = mat1[i][j] * mat2[i][j]
+                    prod[i][j] = mat1[i][j] * mat2[i][j];
                 }
             }
 
-            return prod
+            return prod;
         }
     }
 

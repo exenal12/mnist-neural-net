@@ -39,7 +39,7 @@ public class Network {
             if (prevLayer != null) {
                 if (nextLayer == null) {
                     // init expected bias if and only if on the final layer
-                    expected = new double[neurons][1]
+                    expected = new double[neurons][1];
                 }
                 // xavier initialization for weight generation
                 double weightScale = Math.sqrt(6.0 / (prevLayer.neurons + neurons));
@@ -82,9 +82,9 @@ public class Network {
             
             if (nextLayer == null) {
                 // if on final layer, the calculation is different
-                double[][] actMinusExpected = Linear.Matrix.subtract(this.activations, this.expected)
+                double[][] actMinusExpected = Linear.Matrix.subtract(this.activations, this.expected);
                 double[][] hada = Linear.Matrix.hadamard(actMinusExpected, this.activations);
-                double[][] grad = Linear.Matrix.hadamard(hada, oneMinusAct)
+                double[][] grad = Linear.Matrix.hadamard(hada, oneMinusAct);
                 this.biasGradient = grad;    
             } else if (prevLayer != null && nextLayer != null) {
                 // hidden layers
@@ -191,8 +191,10 @@ public class Network {
         for (int i = 0; i < layers; i++) {
             System.out.println("Layer " + i + " neuron count: " + neuronsPerLayer[i]);
         }
-        System.out.print("Inputs: ");
+        System.out.println ("Inputs: ");
         printInputs();
+        System.out.println("Expected outputs: ");
+        Linear.Matrix.print(tailLayer.expected);
     }
 
     public void part1Setup(){
@@ -211,19 +213,40 @@ public class Network {
             {0.76, 0.48, -0.73},
             {0.34, 0.89, -0.23},
         };
+        layer2.expected = new double[][]{{0.0}, {1.0}};
     }
 
     // traverses linked list and performs a forward pass.
     // after the pass, tailLayer.activations is the final output
     public void forwardPass() {
+        int count = 1;
         Layer cur = headLayer.nextLayer;
         while (cur != null) {
             cur.calculateActivations();
+            System.out.println("Layer " + count + " activations:");
+            Linear.Matrix.print(cur.activations);
+            System.out.println("Layer " + count + " weights:");
+            Linear.Matrix.print(cur.weights);
+            count++;
             cur = cur.nextLayer;
         }
         Linear.Matrix.print(tailLayer.activations);
     }
 
+    // traverses linked list backwards and calculates gradients
+    public void backPropagation() {
+        int count = layers-1;
+        Layer cur = tailLayer;
+        while (cur.prevLayer != null) {
+            cur.calculateBiasGradient();
+            cur.calculateWeightGradient();
+            System.out.println("Layer " + count + " gradients: ");
+            System.out.println("Bias: "); Linear.Matrix.print(cur.biasGradient);
+            System.out.println("Weight: "); Linear.Matrix.print(cur.weightGradient);
+            cur = cur.prevLayer;
+            count--;
+        }
+    }
 }
 
 
