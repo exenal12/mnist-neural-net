@@ -50,9 +50,6 @@ public class Network {
         }
 
         private void calculateActivations() {
-            // due to how i coded my matrix functions, must convert activations/biases to single-column matrices
-
-
             // zMatrix = (W x A) + B
             double[][] zMatrix = Linear.Matrix.add(
                 Linear.Matrix.multiply(this.weights, prevLayer.activations),
@@ -63,6 +60,10 @@ public class Network {
             for (int i = 0; i < neurons; i++) {
                 this.activations[i][0] = sigmoid(zMatrix[i][0]);
             }
+        }
+
+        private void calculateBiasGradient() {
+            
         }
     }
 

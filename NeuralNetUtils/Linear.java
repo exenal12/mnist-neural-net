@@ -58,14 +58,13 @@ public class Linear{
 
         public static double[][] add(double[][] mat1, double[][] mat2) {
             int rows = mat1.length;
+            int columns = mat1[0].length;
+            
+            // check size
             if (rows == 0 || mat2.length != rows) {
                 throw new IllegalArgumentException("Incompatible matrix sizes");
             }
 
-            int columns = mat1[0].length;
-            if (columns == 0) {
-                throw new IllegalArgumentException("Matrices must have at least one column");
-            }
             for (int i = 0; i < rows; i++) {
                 if (mat1[i].length != columns || mat2[i].length != columns) {
                     throw new IllegalArgumentException("Incompatible matrix sizes");
@@ -97,6 +96,44 @@ public class Linear{
             }
     
             return res;
+        }
+
+        public static double[][] transpose(double[][] mat) {
+            // create result matrix, swap row and column counts
+            double[][] res = new double[mat[0].length][mat.length];
+
+            // grab rows, set columns
+            for (int i = 0; i < mat.length; i++) {
+                setColumn(res, i, mat[i]);
+            }
+
+            return res;
+        }
+
+        public static double[][] hadamard(double[][] mat1, double[][] mat2){
+            int rows = mat1.length;
+            int columns = mat1[0].length;
+            
+            // check size
+            if (rows == 0 || mat2.length != rows) {
+                throw new IllegalArgumentException("Incompatible matrix sizes");
+            }
+
+            for (int i = 0; i < rows; i++) {
+                if (mat1[i].length != columns || mat2[i].length != columns) {
+                    throw new IllegalArgumentException("Incompatible matrix sizes");
+                }
+            }
+
+            // iterate, multiply, and return
+            double[][] prod = new double[rows][columns]
+            for (int i = 0; i < rows; i++) {
+                for (int j = 0; j < columns; j++) {
+                    prod[i][j] = mat1[i][j] * mat2[i][j]
+                }
+            }
+
+            return prod
         }
     }
 
