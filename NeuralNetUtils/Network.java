@@ -183,6 +183,8 @@ public class Network {
         };
     }
 
+    // traverses linked list and performs a forward pass.
+    // after the pass, tailLayer.activations is the final output
     public void forwardPass() {
         Layer cur = headLayer.nextLayer;
         while (cur != null) {

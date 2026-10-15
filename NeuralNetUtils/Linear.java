@@ -38,6 +38,7 @@ public class Linear{
             }
         }
     
+        // returns the specified column as a 1D array/vector
         public static double[] getColumn(double[][] mat, int colNum){
            double[] resCol = new double[mat.length];
            
@@ -48,7 +49,13 @@ public class Linear{
            return resCol;
         }
     
-    
+        // sets a column of a matrix
+        public static void setColumn(double[][] mat, int colNum, double[] values){
+            for (int i = 0; i < mat.length; i++) {
+                mat[i][colNum] = values[i];
+            }
+        }
+
         public static double[][] add(double[][] mat1, double[][] mat2) {
             int rows = mat1.length;
             if (rows == 0 || mat2.length != rows) {
