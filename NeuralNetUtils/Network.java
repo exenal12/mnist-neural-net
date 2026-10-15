@@ -10,8 +10,8 @@ public class Network {
         int neurons;
         Layer prevLayer;
         Layer nextLayer;
-        double[] activations;
-        double[] biases;
+        double[][] activations;
+        double[][] biases;
         double[][] weights;
         
         // simple layer constructor
@@ -28,8 +28,8 @@ public class Network {
         // will be called during Network creation
         private void init(Random random){
             // create activations, biases arrays
-            activations = new double[neurons];
-            biases = new double[neurons];
+            activations = new double[neurons][1];
+            biases = new double[neurons][1];
             
             // create weights only if not the first layer
             if (prevLayer != null) {
@@ -51,25 +51,17 @@ public class Network {
 
         private void calculateActivations() {
             // due to how i coded my matrix functions, must convert activations/biases to single-column matrices
-            double[][] prevActivations = new double[prevLayer.activations.length][1];
-            double[][] biasMatrix = new double[neurons][1];
 
-            for (int i = 0; i < prevActivations.length; i++) {
-                prevActivations[i][0] = prevLayer.activations[i];
-            }
-
-            for (int i = 0; i < neurons; i++) {
-                biasMatrix[i][0] = this.biases[i];
-            }
 
             // zMatrix = (W x A) + B
             double[][] zMatrix = Linear.Matrix.add(
-                Linear.Matrix.multiply(this.weights, prevActivations),
-                biasMatrix
+                Linear.Matrix.multiply(this.weights, prevLayer.activations),
+                this.biases
             );
 
+            // apply sigmoid function
             for (int i = 0; i < neurons; i++) {
-                this.activations[i] = sigmoid(zMatrix[i][0]);
+                this.activations[i][0] = sigmoid(zMatrix[i][0]);
             }
         }
     }
@@ -120,11 +112,11 @@ public class Network {
     
     // sets activations on first layer
     public void setInputs(double[] inputs) {
-        headLayer.activations = inputs;
+        Linear.Matrix.setColumn(headLayer.activations, 0, inputs);
     }
 
     public void printInputs() {
-        Linear.Vector.print(headLayer.activations);
+        Linear.Matrix.print(headLayer.activations);
     }
 
     public void setLearningRate(double learningRate) {
@@ -148,7 +140,7 @@ public class Network {
             if (cur.biases == null) {
                 System.out.println("No biases for this layer");
             } else {
-                Linear.Vector.print(cur.biases);
+                Linear.Matrix.print(cur.biases);
             }
             counter++;
             cur = cur.nextLayer;
@@ -170,13 +162,13 @@ public class Network {
         Layer layer0 = headLayer;
         Layer layer1 = layer0.nextLayer;
         Layer layer2 = layer1.nextLayer;
-        layer1.biases = new double[]{0.1, -0.36, -0.31};
+        layer1.biases = new double[][]{{0.1}, {-0.36}, {-0.31}};
         layer1.weights = new double[][]{
             {-0.21, 0.72, -0.25, 1},
             {-0.94, -0.41, -0.47, 0.63},
             {0.15, 0.55, -0.49, -0.75},
         };
-        layer2.biases = new double[]{0.16, -0.46};
+        layer2.biases = new double[][]{{0.16}, {-0.46}};
         layer2.weights = new double[][]{
             {0.76, 0.48, -0.73},
             {0.34, 0.89, -0.23},
@@ -191,7 +183,7 @@ public class Network {
             cur.calculateActivations();
             cur = cur.nextLayer;
         }
-        Linear.Vector.print(tailLayer.activations);
+        Linear.Matrix.print(tailLayer.activations);
     }
 
 }
