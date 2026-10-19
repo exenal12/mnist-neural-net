@@ -111,6 +111,7 @@ public class Network {
     double learningRate;
     int batchSize;
     int epochs;
+    boolean debug;
 
     NetworkData data;
     Layer headLayer;
@@ -172,6 +173,10 @@ public class Network {
     public void setEpochs(int epochs) {
         this.epochs = epochs;
     }
+
+    public void setDebug(boolean debug) {
+        this.debug = debug;
+    }
     // traverse linked list and print
     public void printWeightsAndBiases() {
         int counter = 0;
@@ -200,6 +205,7 @@ public class Network {
     public void printNetworkInfo() {
         System.out.println("Learning rate: " + learningRate);
         System.out.println("Number of epochs: " + epochs);
+        System.out.println("Debug: " + (debug ? "on" : "off"));
         System.out.println("Layer count: " + layers);
         for (int i = 0; i < layers; i++) {
             System.out.println("Layer " + i + " neuron count: " + neuronsPerLayer[i]);
@@ -275,18 +281,23 @@ public class Network {
     // traverses linked list and performs a forward pass.
     // after the pass, tailLayer.activations is the final output
     public void forwardPass() {
+        forwardPass(false);
+    }
+
+    // fromTesting suppresses layer prints even when debug is on,
+    // so the testing loop only shows its own input and result lines
+    private void forwardPass(boolean fromTesting) {
         int count = 1;
         Layer cur = headLayer.nextLayer;
         while (cur != null) {
             cur.calculateActivations();
-            //System.out.println("Layer " + count + " activations:");
-            //Linear.Matrix.print(cur.activations);
-            //System.out.println("Layer " + count + " weights:");
-            //Linear.Matrix.print(cur.weights);
+            if (debug && !fromTesting) {
+                System.out.println("Layer " + count + " activations:");
+                Linear.Matrix.print(cur.activations);
+            }
             count++;
             cur = cur.nextLayer;
         }
-        //Linear.Matrix.print(tailLayer.activations);
     }
 
     // traverses linked list backwards and calculates gradients
@@ -296,16 +307,18 @@ public class Network {
         while (cur.prevLayer != null) {
             cur.calculateBiasGradient();
             cur.calculateWeightGradient();
-            System.out.println("Layer " + count + " gradients: ");
-            System.out.println("Bias: "); Linear.Matrix.print(cur.biasGradient);
-            System.out.println("Weight: "); Linear.Matrix.print(cur.weightGradient);
+            if (debug) {
+                System.out.println("Layer " + count + " gradients: ");
+                System.out.println("Bias: "); Linear.Matrix.print(cur.biasGradient);
+                System.out.println("Weight: "); Linear.Matrix.print(cur.weightGradient);
+            }
             cur = cur.prevLayer;
             count--;
         }
     }
 
     // computes forward pass, backprop, and weight/bias change for a given batch
-    public void calculateNewWeightsAndBiases(ArrayList<TrainingData> batch) {
+    public void calculateNewWeightsAndBiases(ArrayList<TrainingData> batch, int batchNum) {
 
         // create bias and weight sums, skipping input layer
         int trainableLayers = layers - 1;
@@ -328,7 +341,11 @@ public class Network {
         // set network's input, set expected output,
         // perform FP + BP,
         // then add to running bias/weight sum
+        int caseNum = 1;
         for (TrainingData sample : batch) {
+            if (debug) {
+                System.out.println("Case " + caseNum + " of minibatch " + batchNum);
+            }
             setInputs(sample.input);
             Linear.Matrix.setColumn(tailLayer.expected, 0, sample.expected);
             forwardPass();
@@ -342,6 +359,7 @@ public class Network {
                 cur = cur.nextLayer;
                 index++;
             }
+            caseNum++;
         }
 
         // calculating the new weights and biases
@@ -369,8 +387,14 @@ public class Network {
     // for n epochs, run the training loop
     public void runTrainingLoop() {
         for (int e = 0; e < epochs; e++) {
+            System.out.println("Epoch " + (e + 1));
+            int batchNum = 1;
             for (ArrayList<TrainingData> batch : data.minibatches) {
-                calculateNewWeightsAndBiases(batch);
+                if (debug) {
+                    System.out.println("Minibatch " + batchNum);
+                }
+                calculateNewWeightsAndBiases(batch, batchNum);
+                batchNum++;
             }
         }
     }
@@ -380,7 +404,7 @@ public class Network {
     public void runTestingLoop() {
         for (double[] testData : data.testing) {
             setInputs(testData);
-            forwardPass();
+            forwardPass(true);
             System.out.println("Input data: " + Arrays.toString(testData));
             System.out.println("Network result: "); Linear.Matrix.print(tailLayer.activations);
         }

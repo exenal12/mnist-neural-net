@@ -156,6 +156,7 @@ public class Menu {
             System.out.println("3. Set learning rate");
             System.out.println("4. Set inputs");
             System.out.println("5. Set number of epochs");
+            System.out.println("6. Toggle debug (currently " + (neuralNet.debug ? "on" : "off") + ")");
             System.out.println("0. Return to main menu");
             System.out.print("> ");
             String choice = scanner.nextLine();
@@ -184,6 +185,10 @@ public class Menu {
                 case "5":
                     clearScreen();
                     setEpochs();
+                    break;
+                case "6":
+                    clearScreen();
+                    toggleDebug();
                     break;
                 case "0":
                     return;
@@ -232,6 +237,13 @@ public class Menu {
             System.out.println("Enter a valid number.");
         }
 
+        System.out.println("Press Enter to continue.");
+        scanner.nextLine();
+    }
+
+    private static void toggleDebug() {
+        neuralNet.setDebug(!neuralNet.debug);
+        System.out.println("Debug is now " + (neuralNet.debug ? "on" : "off") + ".");
         System.out.println("Press Enter to continue.");
         scanner.nextLine();
     }
