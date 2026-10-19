@@ -56,6 +56,18 @@ public class Linear{
             }
         }
 
+        public static double[][] scalarMultiply(double[][] mat, double scalar) {
+            double[][] res = new double[mat.length][mat[0].length];
+            
+            for (int i = 0; i < mat.length; i++) {
+                for (int j = 0; j < mat[0].length; j++) {
+                    res[i][j] = mat[i][j] * scalar;
+                }
+            }
+
+            return res;
+        }
+
         public static double[][] add(double[][] mat1, double[][] mat2) {
             int rows = mat1.length;
             int columns = mat1[0].length;

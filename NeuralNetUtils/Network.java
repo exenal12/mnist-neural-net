@@ -1,8 +1,9 @@
 package NeuralNetUtils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Arrays;
 import java.util.Random;
-
 // the Network class is a doubly-linked list of Layer objects
 public class Network {
     // Layer class will be where the math happens
@@ -15,6 +16,8 @@ public class Network {
         double[][] weights;
         double[][] biasGradient;
         double[][] weightGradient;
+        double[][] biasGradientSum;
+        double[][] weightGradientSum;
         double[][] expected;
 
         // simple layer constructor
@@ -34,6 +37,7 @@ public class Network {
             activations = new double[neurons][1];
             biases = new double[neurons][1];
             biasGradient = new double[neurons][1];
+            biasGradientSum = new double[neurons][1];
             
             // create weights only if not the first layer
             if (prevLayer != null) {
@@ -48,6 +52,7 @@ public class Network {
                 // cols = # of neurons in prev layer
                 weights = new double[neurons][prevLayer.neurons];
                 weightGradient = new double[neurons][prevLayer.neurons];
+                weightGradientSum = new double[neurons][prevLayer.neurons];
 
                 // fill weights
                 for (int i = 0; i < weights.length; i++) {
@@ -93,6 +98,7 @@ public class Network {
                 double[][] grad = Linear.Matrix.hadamard(hada, oneMinusAct);
                 this.biasGradient = grad;
             }
+            Linear.Matrix.add(this.biasGradientSum, grad);
         }
 
         private void calculateWeightGradient() {
@@ -100,6 +106,7 @@ public class Network {
                 // dont calculate on input layer
                 double [][] grad = Linear.Matrix.multiply(this.biasGradient, Linear.Matrix.transpose(this.prevLayer.activations));
                 this.weightGradient = grad;
+                Linear.Matrix.add(this.weightGradientSum, grad);
             }
         }
     }
@@ -108,15 +115,22 @@ public class Network {
     int[] neuronsPerLayer;
     int layers;
     double learningRate;
+    int batchSize;
+    int epochs;
 
+    NetworkData data;
     Layer headLayer;
     Layer tailLayer;
+
+    FileIO fileIO = new FileIO();
+
 
     // constructor sets neurons per layer
     public Network(int[] neuronsPerLayer) {
         this.neuronsPerLayer = neuronsPerLayer;
         this.layers = 0;
         this.learningRate = 0.10;
+        this.data = new NetworkData();
     }
 
     // adds layer to linked list
@@ -195,6 +209,7 @@ public class Network {
         printInputs();
         System.out.println("Expected outputs: ");
         Linear.Matrix.print(tailLayer.expected);
+        fileIO.init();
     }
 
     public void part1Setup(){
@@ -202,6 +217,8 @@ public class Network {
         Layer layer0 = headLayer;
         Layer layer1 = layer0.nextLayer;
         Layer layer2 = layer1.nextLayer;
+
+        // set weights and biases
         layer1.biases = new double[][]{{0.1}, {-0.36}, {-0.31}};
         layer1.weights = new double[][]{
             {-0.21, 0.72, -0.25, 1},
@@ -214,6 +231,41 @@ public class Network {
             {0.34, 0.89, -0.23},
         };
         layer2.expected = new double[][]{{0.0}, {1.0}};
+
+        // set epochs, learning rate
+        this.epochs = 6;
+        this.learningRate = 10.0;
+
+        // hardcoded training data
+        data.training.add(new TrainingData(
+            new double[] {0,1,0,1},
+            new double[] {0,1}
+        ));
+
+        data.training.add(new TrainingData(
+            new double[] {1,0,1,0},
+            new double[] {1,0}
+        ));
+
+        data.training.add(new TrainingData(
+            new double[] {0,0,1,1},
+            new double[] {0,1}
+        ));
+
+        data.training.add(new TrainingData(
+            new double[] {1,1,0,0},
+            new double[] {1,0}
+        ));
+
+        // add data to minibatches
+        data.minibatches.add(new ArrayList<>(List.of(
+            data.training.get(0),
+            data.training.get(1)
+        )));
+        data.minibatches.add(new ArrayList<>(List.of(
+            data.training.get(2),
+            data.training.get(3)
+        )));
     }
 
     // traverses linked list and performs a forward pass.
