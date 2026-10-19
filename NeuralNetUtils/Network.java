@@ -35,7 +35,6 @@ public class Network {
             activations = new double[neurons][1];
             biases = new double[neurons][1];
             biasGradient = new double[neurons][1];
-            biasGradientSum = new double[neurons][1];
             
             // create weights only if not the first layer
             if (prevLayer != null) {
@@ -50,7 +49,6 @@ public class Network {
                 // cols = # of neurons in prev layer
                 weights = new double[neurons][prevLayer.neurons];
                 weightGradient = new double[neurons][prevLayer.neurons];
-                weightGradientSum = new double[neurons][prevLayer.neurons];
 
                 // fill weights
                 for (int i = 0; i < weights.length; i++) {
@@ -170,6 +168,10 @@ public class Network {
     public void setLearningRate(double learningRate) {
         this.learningRate = learningRate;
     }
+
+    public void setEpochs(int epochs) {
+        this.epochs = epochs;
+    }
     // traverse linked list and print
     public void printWeightsAndBiases() {
         int counter = 0;
@@ -197,6 +199,7 @@ public class Network {
 
     public void printNetworkInfo() {
         System.out.println("Learning rate: " + learningRate);
+        System.out.println("Number of epochs: " + epochs);
         System.out.println("Layer count: " + layers);
         for (int i = 0; i < layers; i++) {
             System.out.println("Layer " + i + " neuron count: " + neuronsPerLayer[i]);
@@ -205,7 +208,6 @@ public class Network {
         printInputs();
         System.out.println("Expected outputs: ");
         Linear.Matrix.print(tailLayer.expected);
-        fileIO.init();
     }
 
     public void part1Setup(){
@@ -262,6 +264,12 @@ public class Network {
             data.training.get(2),
             data.training.get(3)
         )));
+
+        // set testing data
+        data.testing.add(new double[]{0,1,0,1});
+        data.testing.add(new double[]{1,0,1,0});
+        data.testing.add(new double[]{0,0,1,1});
+        data.testing.add(new double[]{1,1,0,0});
     }
 
     // traverses linked list and performs a forward pass.
@@ -271,14 +279,14 @@ public class Network {
         Layer cur = headLayer.nextLayer;
         while (cur != null) {
             cur.calculateActivations();
-            System.out.println("Layer " + count + " activations:");
-            Linear.Matrix.print(cur.activations);
-            System.out.println("Layer " + count + " weights:");
-            Linear.Matrix.print(cur.weights);
+            //System.out.println("Layer " + count + " activations:");
+            //Linear.Matrix.print(cur.activations);
+            //System.out.println("Layer " + count + " weights:");
+            //Linear.Matrix.print(cur.weights);
             count++;
             cur = cur.nextLayer;
         }
-        Linear.Matrix.print(tailLayer.activations);
+        //Linear.Matrix.print(tailLayer.activations);
     }
 
     // traverses linked list backwards and calculates gradients
@@ -364,6 +372,17 @@ public class Network {
             for (ArrayList<TrainingData> batch : data.minibatches) {
                 calculateNewWeightsAndBiases(batch);
             }
+        }
+    }
+
+    // for each piece of data in the testing data,
+    // run it through the network and print results
+    public void runTestingLoop() {
+        for (double[] testData : data.testing) {
+            setInputs(testData);
+            forwardPass();
+            System.out.println("Input data: " + Arrays.toString(testData));
+            System.out.println("Network result: "); Linear.Matrix.print(tailLayer.activations);
         }
     }
 }

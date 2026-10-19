@@ -12,13 +12,15 @@ import java.io.FileReader;
 public class FileIO {
     String data;
     BufferedReader bReader;
-    FileReader fReader = new FileReader("./input/data.csv");
-    File inputFile = new File("./input/data.csv");
+    //FileReader fReader = new FileReader("./input/data.csv");
+    //File inputFile = new File("./input/data.csv");
 
     public void init() {
+        /*
         if (inputFile.exists()) {
             bReader = new BufferedReader(new FileReader("./input/data.csv"));
             System.out.println("Input data found!");
         } else System.out.println("Input data not found!");
+        */
     }
 }

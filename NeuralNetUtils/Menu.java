@@ -58,8 +58,8 @@ public class Menu {
             System.out.println("1. Create network");
             if (neuralNet != null) System.out.println("2. Network options");
             System.out.println("3. Setup for Part 1");
-            if (neuralNet != null) System.out.println("4. Perform a forward pass");
-            if (neuralNet != null) System.out.println("5. Perform back propagation");
+            if (neuralNet != null) System.out.println("4. Start training the network");
+            if (neuralNet != null) System.out.println("5. Run testing data");
             System.out.println("0. Exit");
             System.out.print("> ");
 
@@ -77,7 +77,7 @@ public class Menu {
                 case "4":
                     if (neuralNet != null) {
                         clearScreen();
-                        neuralNet.forwardPass();
+                        neuralNet.runTrainingLoop();
                         System.out.println("Press Enter to continue.");
                         scanner.nextLine();
                     }
@@ -85,7 +85,7 @@ public class Menu {
                 case "5":
                     if (neuralNet != null) {
                         clearScreen();
-                        neuralNet.backPropagation();
+                        neuralNet.runTestingLoop();
                         System.out.println("Press Enter to continue.");
                         scanner.nextLine();
                     }
@@ -102,7 +102,7 @@ public class Menu {
 
     private static void part1Setup() {
         clearScreen();
-        System.out.println("This will set up the network with weights, biases, and learning rate according to part 1 of the assignment.");
+        System.out.println("This will set up the network with weights, biases, learning rate, epochs, and training/testing according to part 1 of the assignment.");
         System.out.println("Type yes or no to continue.\n\n");
         System.out.print("> ");
         String choice = scanner.nextLine().trim();
@@ -155,6 +155,7 @@ public class Menu {
             System.out.println("2. View network info");
             System.out.println("3. Set learning rate");
             System.out.println("4. Set inputs");
+            System.out.println("5. Set number of epochs");
             System.out.println("0. Return to main menu");
             System.out.print("> ");
             String choice = scanner.nextLine();
@@ -179,6 +180,10 @@ public class Menu {
                 case "4":
                     clearScreen();
                     setInputs();
+                    break;
+                case "5":
+                    clearScreen();
+                    setEpochs();
                     break;
                 case "0":
                     return;
@@ -227,6 +232,22 @@ public class Menu {
             System.out.println("Enter a valid number.");
         }
 
+        System.out.println("Press Enter to continue.");
+        scanner.nextLine();
+    }
+
+    private static void setEpochs() {
+        System.out.println("Enter number of epochs to train for: ");
+        System.out.print("> ");
+        String input = scanner.nextLine();
+        try {
+            int newEpochs = Integer.parseInt(input.trim());
+            neuralNet.setEpochs(newEpochs);
+            System.out.println("Network set to " + newEpochs + " epochs");
+        } catch (NumberFormatException e) {
+            System.out.println("Enter a valid number. Must be an integer.");
+        }
+        
         System.out.println("Press Enter to continue.");
         scanner.nextLine();
     }
