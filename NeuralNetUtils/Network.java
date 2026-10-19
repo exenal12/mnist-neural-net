@@ -16,8 +16,6 @@ public class Network {
         double[][] weights;
         double[][] biasGradient;
         double[][] weightGradient;
-        double[][] biasGradientSum;
-        double[][] weightGradientSum;
         double[][] expected;
 
         // simple layer constructor
@@ -98,7 +96,6 @@ public class Network {
                 double[][] grad = Linear.Matrix.hadamard(hada, oneMinusAct);
                 this.biasGradient = grad;
             }
-            Linear.Matrix.add(this.biasGradientSum, grad);
         }
 
         private void calculateWeightGradient() {
@@ -106,7 +103,6 @@ public class Network {
                 // dont calculate on input layer
                 double [][] grad = Linear.Matrix.multiply(this.biasGradient, Linear.Matrix.transpose(this.prevLayer.activations));
                 this.weightGradient = grad;
-                Linear.Matrix.add(this.weightGradientSum, grad);
             }
         }
     }
@@ -297,6 +293,77 @@ public class Network {
             System.out.println("Weight: "); Linear.Matrix.print(cur.weightGradient);
             cur = cur.prevLayer;
             count--;
+        }
+    }
+
+    // computes forward pass, backprop, and weight/bias change for a given batch
+    public void calculateNewWeightsAndBiases(ArrayList<TrainingData> batch) {
+
+        // create bias and weight sums, skipping input layer
+        int trainableLayers = layers - 1;
+        double[][][] biasSums = new double[trainableLayers][][];
+        double[][][] weightSums = new double[trainableLayers][][];
+
+        // walk each layer and initialize sum matrices
+        // each layer will have different size matrices,
+        // so they're being stored as a 3d array
+        int index = 0;
+        Layer cur = headLayer.nextLayer;
+        while (cur != null) {
+            biasSums[index] = new double[cur.neurons][1];
+            weightSums[index] = new double[cur.neurons][cur.prevLayer.neurons];
+            cur = cur.nextLayer;
+            index++;
+        }
+
+        // for each data sample in a batch:
+        // set network's input, set expected output,
+        // perform FP + BP,
+        // then add to running bias/weight sum
+        for (TrainingData sample : batch) {
+            setInputs(sample.input);
+            Linear.Matrix.setColumn(tailLayer.expected, 0, sample.expected);
+            forwardPass();
+            backPropagation();
+
+            index = 0;
+            cur = headLayer.nextLayer;
+            while (cur != null) {
+                biasSums[index] = Linear.Matrix.add(biasSums[index], cur.biasGradient);
+                weightSums[index] = Linear.Matrix.add(weightSums[index], cur.weightGradient);
+                cur = cur.nextLayer;
+                index++;
+            }
+        }
+
+        // calculating the new weights and biases
+        // grabs the descent scalar, multiplies by running sums,
+        // then sets weights and biases and prints results
+        double gd = learningRate / batch.size();
+        index = 0;
+        int count = 1;
+        cur = headLayer.nextLayer;
+        while (cur != null) {
+            double[][] weightProd = Linear.Matrix.scalarMultiply(weightSums[index], gd);
+            double[][] biasProd = Linear.Matrix.scalarMultiply(biasSums[index], gd);
+            cur.weights = Linear.Matrix.subtract(cur.weights, weightProd);
+            cur.biases = Linear.Matrix.subtract(cur.biases, biasProd);
+            System.out.println("Layer " + count + " new weights: ");
+            Linear.Matrix.print(cur.weights);
+            System.out.println("Layer " + count + " new biases: ");
+            Linear.Matrix.print(cur.biases);
+            index++;
+            count++;
+            cur = cur.nextLayer;
+        }
+    }
+
+    // for n epochs, run the training loop
+    public void runTrainingLoop() {
+        for (int e = 0; e < epochs; e++) {
+            for (ArrayList<TrainingData> batch : data.minibatches) {
+                calculateNewWeightsAndBiases(batch);
+            }
         }
     }
 }
