@@ -281,37 +281,48 @@ public class Network {
     // traverses linked list and performs a forward pass.
     // after the pass, tailLayer.activations is the final output
     public void forwardPass() {
-        forwardPass(false);
-    }
-
-    // fromTesting suppresses layer prints even when debug is on,
-    // so the testing loop only shows its own input and result lines
-    private void forwardPass(boolean fromTesting) {
-        int count = 1;
         Layer cur = headLayer.nextLayer;
         while (cur != null) {
             cur.calculateActivations();
-            if (debug && !fromTesting) {
-                System.out.println("Layer " + count + " activations:");
-                Linear.Matrix.print(cur.activations);
-            }
-            count++;
             cur = cur.nextLayer;
         }
     }
 
     // traverses linked list backwards and calculates gradients
     public void backPropagation() {
-        int count = layers-1;
         Layer cur = tailLayer;
         while (cur.prevLayer != null) {
             cur.calculateBiasGradient();
             cur.calculateWeightGradient();
-            if (debug) {
-                System.out.println("Layer " + count + " gradients: ");
-                System.out.println("Bias: "); Linear.Matrix.print(cur.biasGradient);
-                System.out.println("Weight: "); Linear.Matrix.print(cur.weightGradient);
-            }
+            cur = cur.prevLayer;
+        }
+    }
+
+    private void printCaseDebug(int caseNum, TrainingData sample) {
+        System.out.print("    Case " + caseNum + "    input ");
+        Linear.Vector.print(sample.input);
+        System.out.print("    expected ");
+        Linear.Vector.print(sample.expected);
+        System.out.print("    output ");
+        Linear.Vector.print(Linear.Matrix.getColumn(tailLayer.activations, 0));
+        System.out.println();
+
+        int count = 1;
+        Layer cur = headLayer.nextLayer;
+        while (cur != null) {
+            System.out.printf("      Layer %d %-12s ", count, "activations");
+            Linear.Matrix.print(cur.activations);
+            count++;
+            cur = cur.nextLayer;
+        }
+
+        count = layers - 1;
+        cur = tailLayer;
+        while (cur.prevLayer != null) {
+            System.out.printf("      Layer %d %-12s ", count, "bias grad");
+            Linear.Matrix.print(cur.biasGradient);
+            System.out.println("      Layer " + count + " weight grad");
+            Linear.Matrix.print(cur.weightGradient, "        ");
             cur = cur.prevLayer;
             count--;
         }
@@ -343,13 +354,13 @@ public class Network {
         // then add to running bias/weight sum
         int caseNum = 1;
         for (TrainingData sample : batch) {
-            if (debug) {
-                System.out.println("Case " + caseNum + " of minibatch " + batchNum);
-            }
             setInputs(sample.input);
             Linear.Matrix.setColumn(tailLayer.expected, 0, sample.expected);
             forwardPass();
             backPropagation();
+            if (debug) {
+                printCaseDebug(caseNum, sample);
+            }
 
             index = 0;
             cur = headLayer.nextLayer;
@@ -369,15 +380,20 @@ public class Network {
         index = 0;
         int count = 1;
         cur = headLayer.nextLayer;
+        if (debug) {
+            System.out.println("  Minibatch " + batchNum + " updated weights");
+        }
         while (cur != null) {
             double[][] weightProd = Linear.Matrix.scalarMultiply(weightSums[index], gd);
             double[][] biasProd = Linear.Matrix.scalarMultiply(biasSums[index], gd);
             cur.weights = Linear.Matrix.subtract(cur.weights, weightProd);
             cur.biases = Linear.Matrix.subtract(cur.biases, biasProd);
-            System.out.println("Layer " + count + " new weights: ");
-            Linear.Matrix.print(cur.weights);
-            System.out.println("Layer " + count + " new biases: ");
-            Linear.Matrix.print(cur.biases);
+            if (debug) {
+                System.out.println("    Layer " + count + " weights");
+                Linear.Matrix.print(cur.weights, "      ");
+                System.out.print("    Layer " + count + " biases  ");
+                Linear.Matrix.print(cur.biases);
+            }
             index++;
             count++;
             cur = cur.nextLayer;
@@ -387,11 +403,13 @@ public class Network {
     // for n epochs, run the training loop
     public void runTrainingLoop() {
         for (int e = 0; e < epochs; e++) {
+            if (debug) System.out.println();
             System.out.println("Epoch " + (e + 1));
             int batchNum = 1;
             for (ArrayList<TrainingData> batch : data.minibatches) {
                 if (debug) {
-                    System.out.println("Minibatch " + batchNum);
+                    System.out.println();
+                    System.out.println("  Minibatch " + batchNum);
                 }
                 calculateNewWeightsAndBiases(batch, batchNum);
                 batchNum++;
@@ -404,7 +422,7 @@ public class Network {
     public void runTestingLoop() {
         for (double[] testData : data.testing) {
             setInputs(testData);
-            forwardPass(true);
+            forwardPass();
             System.out.println("Input data: " + Arrays.toString(testData));
             System.out.println("Network result: "); Linear.Matrix.print(tailLayer.activations);
         }

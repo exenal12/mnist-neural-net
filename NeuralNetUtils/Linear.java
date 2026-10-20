@@ -6,9 +6,9 @@ public class Linear{
         public static void print(double[] vec) {
             System.out.print("[");
             for (double value : vec) {
-                System.out.printf(" %8.4f", value);
+                System.out.printf(" %8.5f", value);
             }
-            System.out.println(" ]");
+            System.out.print(" ]");
         }
 
         public static double dotProduct(double[] vec1, double[] vec2) {
@@ -29,8 +29,18 @@ public class Linear{
     public static class Matrix {
 
         public static void print(double[][] mat) {
+            print(mat, "");
+        }
+
+        public static void print(double[][] mat, String indent) {
+            if (mat.length > 0 && mat[0].length == 1) {
+                System.out.print(indent);
+                Vector.print(getColumn(mat, 0));
+                System.out.println();
+                return;
+            }
             for (double[] row : mat) {
-                System.out.print("[");
+                System.out.print(indent + "[");
                 for (double value : row) {
                     System.out.printf(" %8.5f", value);
                 }
