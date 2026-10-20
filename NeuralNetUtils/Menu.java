@@ -1,5 +1,12 @@
 package NeuralNetUtils;
 import java.util.Scanner;
+
+/*
+name: Alyx Braud
+assignment: MNIST Neural Net Pt. 1
+Date: 10/20/2026
+*/
+
 public class Menu {
     private static final Scanner scanner = new Scanner(System.in);
     private static boolean running = true;

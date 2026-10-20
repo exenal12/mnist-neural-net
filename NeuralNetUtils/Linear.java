@@ -1,5 +1,11 @@
 package NeuralNetUtils;
 
+/*
+name: Alyx Braud
+assignment: MNIST Neural Net Pt. 1
+Date: 10/20/2026
+*/
+
 public class Linear{
     public static class Vector {
 

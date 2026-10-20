@@ -4,6 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Arrays;
 import java.util.Random;
+
+/*
+name: Alyx Braud
+assignment: MNIST Neural Net Pt. 1
+Date: 10/20/2026
+*/
+
 // the Network class is a doubly-linked list of Layer objects
 public class Network {
     // Layer class will be where the math happens
@@ -117,8 +124,6 @@ public class Network {
     Layer headLayer;
     Layer tailLayer;
 
-    FileIO fileIO = new FileIO();
-
 
     // constructor sets neurons per layer
     public Network(int[] neuronsPerLayer) {
@@ -179,10 +184,10 @@ public class Network {
     }
     // traverse linked list and print
     public void printWeightsAndBiases() {
-        int counter = 0;
+        int index = 0;
         Layer cur = headLayer;
         while (cur != null) {
-            System.out.println("Layer " + counter);
+            System.out.println("Layer " + index);
             System.out.println("Weights: ");
             
             if (cur.weights == null) {
@@ -197,7 +202,7 @@ public class Network {
             } else {
                 Linear.Matrix.print(cur.biases);
             }
-            counter++;
+            index++;
             cur = cur.nextLayer;
         }
     }
@@ -262,20 +267,47 @@ public class Network {
         ));
 
         // add data to minibatches
-        data.minibatches.add(new ArrayList<>(List.of(
+        data.minibatches.add(new ArrayList<>(Arrays.asList(
             data.training.get(0),
             data.training.get(1)
         )));
-        data.minibatches.add(new ArrayList<>(List.of(
+        data.minibatches.add(new ArrayList<>(Arrays.asList(
             data.training.get(2),
             data.training.get(3)
         )));
 
         // set testing data
-        data.testing.add(new double[]{0,1,0,1});
-        data.testing.add(new double[]{1,0,1,0});
-        data.testing.add(new double[]{0,0,1,1});
-        data.testing.add(new double[]{1,1,0,0});
+        data.testing.add(new TrainingData(
+            new double[] {0,1,0,1},
+            new double[] {0,1}
+        ));
+
+        data.testing.add(new TrainingData(
+            new double[] {1,0,1,0},
+            new double[] {1,0}
+        ));
+
+        data.testing.add(new TrainingData(
+            new double[] {0,0,1,1},
+            new double[] {0,1}
+        ));
+
+        data.testing.add(new TrainingData(
+            new double[] {1,1,0,0},
+            new double[] {1,0}
+        ));
+    }
+
+    // mean of (activation - expected)^2 across the output neurons
+    private double meanSquaredError() {
+        double[] output = Linear.Matrix.getColumn(tailLayer.activations, 0);
+        double[] expected = Linear.Matrix.getColumn(tailLayer.expected, 0);
+        double sum = 0;
+        for (int i = 0; i < output.length; i++) {
+            double diff = output[i] - expected[i];
+            sum += diff * diff;
+        }
+        return sum / output.length;
     }
 
     // traverses linked list and performs a forward pass.
@@ -307,24 +339,24 @@ public class Network {
         Linear.Vector.print(Linear.Matrix.getColumn(tailLayer.activations, 0));
         System.out.println();
 
-        int count = 1;
+        int index = 1;
         Layer cur = headLayer.nextLayer;
         while (cur != null) {
-            System.out.printf("      Layer %d %-12s ", count, "activations");
+            System.out.printf("      Layer " + index +" activations ");
             Linear.Matrix.print(cur.activations);
-            count++;
+            index++;
             cur = cur.nextLayer;
         }
 
-        count = layers - 1;
+        index = layers - 1;
         cur = tailLayer;
         while (cur.prevLayer != null) {
-            System.out.printf("      Layer %d %-12s ", count, "bias grad");
+            System.out.printf("      Layer " + index + " bias grad ");
             Linear.Matrix.print(cur.biasGradient);
-            System.out.println("      Layer " + count + " weight grad");
+            System.out.println("      Layer " + index + " weight grad ");
             Linear.Matrix.print(cur.weightGradient, "        ");
             cur = cur.prevLayer;
-            count--;
+            index--;
         }
     }
 
@@ -332,13 +364,14 @@ public class Network {
     public void calculateNewWeightsAndBiases(ArrayList<TrainingData> batch, int batchNum) {
 
         // create bias and weight sums, skipping input layer
-        int trainableLayers = layers - 1;
-        double[][][] biasSums = new double[trainableLayers][][];
-        double[][][] weightSums = new double[trainableLayers][][];
-
-        // walk each layer and initialize sum matrices
         // each layer will have different size matrices,
         // so they're being stored as a 3d array
+        // e.g. biasSums[layerNum][rowNum][colNum]
+        // stores (layers-1) matrices because input layer isn't used during backprop
+        double[][][] biasSums = new double[layers-1][][];
+        double[][][] weightSums = new double[layers-1][][];
+
+        // walk each layer and initialize sum matrices
         int index = 0;
         Layer cur = headLayer.nextLayer;
         while (cur != null) {
@@ -351,7 +384,7 @@ public class Network {
         // for each data sample in a batch:
         // set network's input, set expected output,
         // perform FP + BP,
-        // then add to running bias/weight sum
+        // then go through each layer and add to running sums
         int caseNum = 1;
         for (TrainingData sample : batch) {
             setInputs(sample.input);
@@ -360,6 +393,7 @@ public class Network {
             backPropagation();
             if (debug) {
                 printCaseDebug(caseNum, sample);
+                System.out.println("    Case " + caseNum + " cost: " + meanSquaredError());
             }
 
             index = 0;
@@ -375,10 +409,9 @@ public class Network {
 
         // calculating the new weights and biases
         // grabs the descent scalar, multiplies by running sums,
-        // then sets weights and biases and prints results
+        // then sets weights and biases
         double gd = learningRate / batch.size();
         index = 0;
-        int count = 1;
         cur = headLayer.nextLayer;
         if (debug) {
             System.out.println("  Minibatch " + batchNum + " updated weights");
@@ -389,13 +422,12 @@ public class Network {
             cur.weights = Linear.Matrix.subtract(cur.weights, weightProd);
             cur.biases = Linear.Matrix.subtract(cur.biases, biasProd);
             if (debug) {
-                System.out.println("    Layer " + count + " weights");
+                System.out.println("    Layer " + (index + 1) + " weights");
                 Linear.Matrix.print(cur.weights, "      ");
-                System.out.print("    Layer " + count + " biases  ");
+                System.out.print("    Layer " + (index + 1) + " biases  ");
                 Linear.Matrix.print(cur.biases);
             }
             index++;
-            count++;
             cur = cur.nextLayer;
         }
     }
@@ -420,11 +452,15 @@ public class Network {
     // for each piece of data in the testing data,
     // run it through the network and print results
     public void runTestingLoop() {
-        for (double[] testData : data.testing) {
-            setInputs(testData);
+        for (TrainingData testData : data.testing) {
+            setInputs(testData.input);
+            Linear.Matrix.setColumn(tailLayer.expected, 0, testData.expected);
             forwardPass();
-            System.out.println("Input data: " + Arrays.toString(testData));
-            System.out.println("Network result: "); Linear.Matrix.print(tailLayer.activations);
+            System.out.println("Input data: " + Arrays.toString(testData.input));
+            System.out.println("Expected: " + Arrays.toString(testData.expected));
+            System.out.println("Network result: ");
+            Linear.Matrix.print(tailLayer.activations);
+            System.out.println("Cost: " + meanSquaredError());
         }
     }
 }
